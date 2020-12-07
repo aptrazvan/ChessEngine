@@ -1,0 +1,39 @@
+In loc de apelarea functiei nextMove din etapa anterioara pentru executarea unei mutari la primirea unui input sau schimbarea culorii, in functia 
+main se salveaza toate mutarile disponibile valide prin getValidMoves, se alege una la intamplare daca exista si se executa mutarea prin applyMove.
+Functia debugPrint este implementata in xboardFunctions.cpp si, impreuna cu afisarea de dinaintea ei, afiseaza la fiecare mutare de piesa in 
+xboard.debug in ordine: mai multe linii de forma [x, y z] ce repreinta mutarile posibile gasite de getValidMoves, unde x este tipul piesei, y 
+spatiul de pe care se deplaseaza si z spatiul pe care se deplaseaza, doua linii de cate 16 numere reprezentand pozitiile tuturor pieselor pe tabla 
+de joc salvate in board->whitePieces si board->blackPieces, apoi tabla de joc in starea curenta. In cazul unui bug, precum o mutare ilegala, sursa 
+problemei se poate gasi incepand de la aceste afisari. Prin checkPromotion de la finalul blocului se verifica daca un pion a ajuns la capatul 
+tablei pentru promovare la regina.
+
+Functia movePiece, asemenea punctului anterior, muta piesa primita de la xboard pe tabla, tinand cont si de rocada si en passant.
+Functia getValidMoves returneaza un vector<Move> cu toate mutarile valide. Functia apeleaza getAvailableMoves care trece prin toate piesele si 
+verifica toate spatiile posibile pe care se poate depplasa conform regulamentului. Se verifica apoi pentru fiecare mutare obtinuta posibilitatea 
+de a intra in sah in urma executarii acesteia, devvenind o mutare invalida.
+Dupa ce s-a ales o mutare, se apeleaza applyMove cu parametru mutarea respectiva. Aceasta se comporta similar functiei movePiece, mutand piesa 
+primita pe tabla si tinand cont de rocada si en passant.
+Celelalte functii, precum inCheck sau checkValidCastling au fost utilizate in cele anterioare pentru atingerea obiectivului.
+
+Pentru urmatoarea parte, in algoritmul minmax, se va utiliza getValidMoves pentru obtinerea listei cu toate mutarile disponibile si se va face 
+apela applyMove pe fiecare dintre acestea pentru a se compara rezultatele si a se evalua pe baza criteriului ales. Dupa fiecare mutare se va apela 
+checkPromotion pentru verificare, sau se poate include functia in applyMove, respectiv movePiece, pentru modularizare. In functie de perfomanta 
+engine-ului in timp si in partida, se va adjusta adancimea algoritmului. O idee primitiva pentru functia de evaluare ar putea fi: puncte in plus 
+pentru numarul total de piese luate, fiecare piesa cu valori diferite, puncte minus masive pentru intrarea in sah, pentru a nu risca intrarea in 
+mat la o evaluare defectuosa. Inaintea aplicarii unei mutari, se poate salva o copie a tablei de joc la care se revine dupa executarea mutarii.
+
+Rocada si en passant la executarea oponentului nu au fost testate suficient, s-ar putea sa mai provoace bug-uri. Pad-ul sau remiza nu a fost 
+implementata. Presupun ca xboard-ul va detecta situatia asta si va trimite o comanda specifica, pe care o putem prelua in main.
+
+
+
+	Petru:
+
+Pentru testarea etapei 2, in loc de comanda make run, dati comanda "make run_etapa2". Pentru testatrea manuala (om vs program/bot) dati comanda "make run_etapa1".
+
+In etapa 2, programul nostru joaca alternativ cu albele, iar fairymax cu negrele.
+
+Pentru rularea etapei 3 sunt doua variante:
+	- make run_etapa33   4 jocuri contra fairymax pe deapth 3
+	- make run_etapa34   4 jocuri contra fairymax pe deapth 4
+

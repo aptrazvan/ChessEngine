@@ -1,0 +1,66 @@
+<Copyright Proiect PA 2020, Razvan Mihai Apetroaie, Laurentiu Constantin Petre, Petru Alexandru Mateescu, 323CA>
+
+Instructiuni de compilare:
+	*** make / make build *** compileaza programul
+	*** make run *** ruleaza programul
+	*** make run_etapa1 *** porneste xboard, un player este omul, iar celalalt este programul
+	*** make run_etapa2 *** porneste xboard, un player este programul, iar celalalt este "fairymax"; sunt setati toti parametrii conform cu regulamentul
+	*** make run_etapa33 *** asemanator comenzii anterioare; 4 meciuri contra fairymax pe depth 3
+	*** make run_etapa34 *** asemanator comenzii anterioare; 4 meciuri contra fairymax pe depth 4
+	*** make clean *** sterge executabilul, fisierele xboard.debug si partide.txt
+
+Structura proiectului:
+	Definitiile functiilor, structurilor si a constantelor utilizate in reprezentarea pieselor si a tablei de sah se regasesc in "definitions.h".
+	Fisierul "boardFunctions.cpp" contine functii adresate tablei de joc si mutarii pieselor, iar "xboardFunctions.cpp" cuprinde functii specifice
+	xboard-ului. In "main.cpp" se realizeaza conexiunea intrare-iesire intre xboard si functiile mentionate.
+
+
+	Etapa I
+
+Abordarea algoritmica: 
+	In aceasta etapa engine-ul realizeaza doar mutarea pionilor: se incearca dupa caz mutarea primului pion disponibil cu doua spatii in fata,
+	apoi mutarea cu un spatiu in fata, altfel mutarea acestuia pe diagonala.
+
+	Etapa II
+
+	In aceasta etapa am implementat un algoritm alpha-beta prin care se incearca reducerea numarului de mutari ce trebuie parcurse in algoritmul 
+	minimax pentru determinarea mutarii engine-ului. Se folosesc valori pentru piese, respectiv pentru pozitiile pieselor (matricea MATRIX).
+	Pentru determinarea mutarilor valide se foloseste functia getValidMoves. Aceasta apeleaza functia getAvailableMoves care obtine pentru toate
+	piesele, mutarile posibile specifice, dupa care verifica validitatea acestora in raport cu starea tablei de joc. Functiile checkPromotion,
+	inCheck, checkValidCastling sunt folosite pentru a verifica daca un pion se poate promova la statutul de regina, pentru a verifica daca se 
+	obtine o pozitie de sah pe tabla, respectiv daca se poate efectua rocada. Functia applyMove aplica o mutare curenta pe tabla prin verificarea 
+	conditiilor de en-passant, castling si obtinerea mutarii propiu-zise trimisa spre xboard.
+
+	Pentru a particulariza evaluarea tablei de sah, se foloseste un scor pentru a tine evidenta pieselor de valori mai mari (regele) sau mai mici
+	(pionul), pentru a contoriza o eventuala pozitie de sah sau pentru a verifica numarul de mutari disponibile pentru cele doua culori.
+	Se foloseste o verificare pentru a stabili adancimea maxima (4 sau 5) la care poate ajunge arborele alpha-beta, prin numarul de piese de pe 
+	tabla(>25). Se poate obtine o eficienta prin sortarea mutarilor din functia minimax in legatura cu prioritatile acestora in functie de 
+	sansele sa existe o capturare a  unei piese adverse.
+	Complexitate alpha-beta : O(n^d), n - numarul de mutari valide pentru cazul cel mai rau, fiind redus semnificativ in cazul mediu,
+	si d - adancimea maxima.
+
+	Etapa III
+
+	In aceasta etapa am adaugat doua tehnicii de imbunatatire a algoritmului alfa-beta: quiescence search si history heuristic.
+	Quiescence search este implementat dupa modelul algortimului alfa-beta, difera faptul ca mutarile sunt alese ca fiind cele disponibile in cazul
+	in care nu s-a ajuns intr-o pozitie de sah. Pentru fiecare recursivitate a algoritmului minimax, se verifica care este adancimea.
+	Daca adancimea este diferita de unu, se continua cu quiescence search, incercandu-se astfel, mutari valide si care nu prezinta o situatie de
+	sah.
+
+	History heuristic este o euristica prin care se salveaza cele mai bune mutari in urma executarii algoritmilor minimax si quiescence search.
+	Prin aceasta, se reduce timpul de cautare in spatiul starilor pentru tabla de sah, prin eliminarea incercarilor de a se realiza o mutare care
+	a fost anterior salvata in history.
+	Pentru fiecare mutare, se verifica daca a fost adaugata in history, continuandu-se ciclul de minimax. 
+	Complexitatea algoritmului quiescence search este O(n^d), n - numarul de mutari valide si  d - adancimea maxima.
+
+Surse de inspiratie:
+	Pentru structurarea proiectului si implementarea comenzilor specifici xboard-ului, s-au utilizat ca materiale auxiliare:
+	https://www.youtube.com/watch?v=VuJL4qhpp-8&list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&index=2
+	https://www.youtube.com/watch?v=DZwW-st4Jl8
+	https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
+
+	
+Alte detalii:
+	Pe sistemele pe care s-au efectuat testele, engine-ul reuseste sa finalizeze partidele in timpul disponibil. Daca prin testarea acestuia pe
+	alte platforme nu reuseste sa se incadreze in timpul dat, se poate scadea parametrul PIECES_THRESHOLD din definitions.h pentru imbunatatirea
+	timpului de rulare pana la nivelul setat, cu efect insa in performanta programului.
